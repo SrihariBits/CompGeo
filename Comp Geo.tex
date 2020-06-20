@@ -1,0 +1,113 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage[headheight=65pt,tmargin=65pt,headsep=5pt]{geometry}
+\newcommand{\etal}{\textit{et al.}}
+\usepackage{hyperref}
+
+
+\title{%
+ \LARGE  CS F402 Computational Geometry
+\newline
+\newline
+\LARGE Proposal, Literature Survey and Initial work\\
+\Large Capacitated K-Supplier Problem
+}
+
+\author{%
+ \begin{tabular}{c} \small Raj Kashyap\\ \small Mallala\\ \small2017A7PS0025H \end{tabular}\and
+ \begin{tabular}{c} \small L Srihari\\ \small2017A7PS1670H \end{tabular}\and
+ \begin{tabular}{c}\small T Naga Sai\\ \small Bharath\\ \small2017A7PS0209H \end{tabular}
+}
+\date{February 2020}
+
+\begin{document}
+\maketitle
+\section{Problem Statement}
+Given a set \textbf{\textit{F}} of \textbf{\textit{m}} points associated with non-negative integer capacity and a set \textbf{\textit{C}} of \textbf{\textit{n}} points in the plane, the objective is to open a set $\textbf{\textit{F}}’$ $\subseteq$ \textbf{\textit{F}} of \textbf{\textit{k}} facilities such that the maximum distance of any client in \textbf{\textit{C}} to its nearest open facility in \textbf{\textit{F}}’ is minimized. The number of clients assigned to a center can not exceed the center’s capacity.\\
+
+Let $d(f,\textbf{\textit{F}}’)$ = minimum distance from point f to g where g is any point in  \textbf{\textit{F}}'. Then,
+\begin{equation} d(f,\textbf{\textit{F}}’) = \emph{min}\;d(f,g) : g \in \textbf{\textit{F}}’\end{equation}
+The given problem can be expressed as,\begin{center}\textbf{minimize} $max\;d(f,$\textbf{\textit{F}}’$)$, where\end{center}
+$\;$\textit{f} $\in$  \textbf{\textit{C}} and $\textbf{\textit{F}}'$ $\subseteq$ \textbf{\textit{F}} such that $| \textbf{\textit{F}}' | = \textbf{\textit{k}}$\\
+
+\section{Introduction}
+Multiple applications of the capacitated K-supplier problem can be found. One obvious application is in the domain of facility location in supply - chain markets and businesses, commonly observed in large supermarket chains. Here the consumer outlets form the set \textbf{\textit{C}} and locations of potential intermediate suppliers form the set  \textbf{\textit{F}}.\\
+Other applications include opening hospitals in a city with limited capacities, opening of centres for the disposal of obnoxious substances, setting up servers in a network, data mining and information retrieval such as data clustering.\\
+
+Capacitated k-center problem is another NP-hard problem closely related to the capacitated k-supplier problem. In this problem, there is a single set \textbf{\textit{C}} from which a set $\textbf{\textit{C}}'$ of k points are required to be chosen so as to minimize the maximum distance of a point in the set \textbf{\textit{C}} to a point in the set  $\textbf{\textit{C}}'$, while ensuring that the assignments to a center cannot exceed its capacity. Any solution to this problem has the possibility of extension to our problem.\\
+
+\section{Literature Review and Initial work}
+The k-center problems have been extensively studied in the literature with many variants like outliers, opening costs etc. A simple,  tight 2-approximation algorithm was given by Hochbaum and Shmoys\cite{KCBest} in \textit{O}$(n^2 \log_2 n)$ in general metrics as early as 1985. Several other variations of this problem have been studied. The k-supplier problem which is a generalization of k-center problem has tight approximation ratio of 3 in general metrics given by Hochbaum and Shmoys which runs in \textit{O}$((n^2 + mn)\log_2(mn))$ time\cite{KSgen}. Later a capacitated version of the k-center problem was proposed by Bar-Ilan, Kortsarz and Peleg\cite{capKC}.They gave a 10-factor approximation algorithm with polynomial running time.It was later improved by Khuller and Sussmann\cite{capKCimprove} to 6 in the case of uniform capacities. When multiple centers can be opened in the same location the bound was improved to 5. Much later after a gap of 15 years, in 2012, Cygan, Hajiaghayi and Khuller\cite{LPround} proposed a LP rounding algorithm with constant factor approximation algorithm for arbitrary capacities with a factor in hundreds. Later it was improved to a 9-approximation by An, Bhaskara and Svensson\cite{capKCcentrality}.\\
+
+There are many different specializations of this problem such as the capacitated k-center with outliers and non-uniform capacities with a approximation factor of 25 (Kociumaka Cygan\cite{capKCoutliers}(2014)), the fault-tolerant capacitated k-center(Chechik and Peleg\cite{capKCfault}(2015)) where nodes can be reassigned to some other centers in the case of a failure with an approximation factor of 9, it was later improved by Fernandes et al.\cite{capKCtolImp}(2016) to 6. Recently Ding et al.(2017)\cite{capKCbound} came with capacitated k-center problem with two sided bounds and outliers with a combinatorial algorithm as opposed to previous works which are mainly based on LP. A Heterogeneous variation of this problem where capacities to be installed is decided by the algorithm based on the locations is studied by Chakrabarty et al.\cite{capKCloc}(2016).\\
+
+To the best of our knowledge, the problem of our interest i.e the capacitated k-supplier problem without any constraints on it not studied very deeply but An et al.\cite{capKCcentrality} in their paper, extended their approach to capacitated k-supplier problem and achieved an approximation factor of 11. Capacitated k-supplier with bounds and outliers have also been studied (\cite{capKCoutliers},\cite{capKCbound}).\\
+
+Initial work involved understanding the main idea of each of the cited research work and search for the prospect of improvement. NP-hard problems given as a part of competitive programming contests were collected and those analogous to capacitative K-supplier problem were identified. Efficient use of datastructures were studied in the solutions which gave best performance.\\
+
+\section{Proposal to improve the existing work}
+In our research, we hope to extend the capacitated k-supplier problem which has an approximation factor of 11 in general metrics to Euclidean metrics. We anticipate a decrease in approximation factor, by using the properties of Euclidean space. We draw inspiration mainly from Nagarajan et al.'s\cite{EuclideanKS}  paper where the authors have heavily used the properties of Euclidean space and got an approximation ratio of 2.74 in the case of Euclidean k-supplier problem where it is NP-hard to approximate it beyond a factor of 2.64 in Euclidean metrics and a factor of 3 in general space. We hope to extend LP rounding, centrality of trees concepts of An et al. 's\cite{capKCcentrality} work to reach the desired goal.
+\begin{thebibliography}{9}
+\bibitem{KCBest} 
+Dorit S. Hochbaum, David B. Shmoys
+\textit{A Best Possible Heuristic for the k-Center Problem}.
+Mathematics of Operations Research 10(2):180-184, May 1985
+
+\bibitem{KSgen} 
+Dorit S. Hochbaum, David B. Shmoys
+\textit{A unified approach to approximation algorithms for bottleneck problems}.
+%\textit{The Euclidean k-Supplier Problem in ${\rm I\!R}^2$}. 
+ J. ACM 33(3), 533–550, 1986
+
+\bibitem{capKC}
+J. Bar-Ilan, G. Kortsarz, and D. Peleg
+\textit{How to allocate network centers}. 
+Journal of Algorithms, vol. 15, pp. 385-415, 1993..
+
+\bibitem{capKCimprove} 
+Samir Khuller, Yoram J. Sussmann
+\textit{The capacitated K-center problem}.
+European Symposium on Algorithms, 2005
+
+\bibitem{LPround} 
+M. Cygan, M. Hajiaghayi and S. Khuller
+\textit{LP Rounding for k-Centers with Non-uniform Hard Capacities}.
+IEEE 53rd Annual Symposium on Foundations of Computer Science, New Brunswick, NJ, 2012, pp. 273-282, 2012
+
+\bibitem{capKCcentrality} 
+Hyung-Chan An and Aditya Bhaskara and Ola Svensson
+\textit{Centrality of Trees for Capacitated k-Center}.
+arXiv:1304.2983v1 [cs.DS], April 2013
+
+\bibitem{capKCoutliers} 
+Tomasz Kociumaka, Marek Cygan
+\textit{Constant Factor Approximation for Capacitated k-Center with Outliers}.
+arXiv:1401.2874v1 [cs.DS], January 2014
+
+\bibitem{capKCfault} 
+Shiri Chechik, David Peleg
+\textit{The fault-tolerant capacitated K-center problem}.
+Theoretical Computer Science 566 (12-25),  2015
+
+\bibitem{capKCtolImp} 
+Cristina G. Fernandes, Samuel P. de Paula, Lehilton L. C. Pedrosa
+\textit{Improved Approximation Algorithms for Capacitated Fault-Tolerant k-Center}.
+Algorithmica, 2016
+
+\bibitem{capKCbound} 
+Hu Ding, Lunjia Hu, Lingxiao Huang, Jian Li
+\textit{Capacitated Center Problems with Two-Sided Bounds and Outliers}.
+arXiv:1702.07435v1 [cs.DS], February 2017
+
+\bibitem{capKCloc} 
+Deeparnab Chakrabarty, Ravishankar Krishnaswamy, Amit Kumar
+\textit{The Heterogeneous Capacitated k-Center Problem}.
+Integer Programming and Combinatorial Optimization. IPCO 2017.
+
+\bibitem{EuclideanKS} 
+Viswanath Nagarajan, Baruch Schieber, and Hadas Shachnai
+\textit{The Euclidean k-Supplier Problem}.
+Integer Programming and Combinatorial Optimization. IPCO 2013.
+\end{thebibliography}
+\end{document}
