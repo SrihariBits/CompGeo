@@ -122,7 +122,6 @@ public:
                 candidates[i] = {};
                 bridges[i] = {};
             }
-
             augmented = search();
         }
 
@@ -254,7 +253,6 @@ public:
                 return false;
             int level_vL = min(nodeEvenLevel[dfsInfo.vL], nodeOddLevel[dfsInfo.vL]);
             int level_vR = min(nodeEvenLevel[dfsInfo.vR], nodeOddLevel[dfsInfo.vR]);
-
             if (mate.find(dfsInfo.vL) == mate.end() and mate.find(dfsInfo.vR) == mate.end()) //both exposed
             {
                 vector<pair<int, int>> pathL = findPath(dfsInfo.s, dfsInfo.vL, none);
@@ -444,10 +442,10 @@ public:
             {
                 dfsInfo.vL = nodeParent[dfsInfo.vL];
             }
-            else if (nodeParent[dfsInfo.vR] != None)
-            {
-                dfsInfo.vR = nodeParent[dfsInfo.vR];
-            }
+        }
+        else if (nodeParent[dfsInfo.vR] != None)
+        {
+            dfsInfo.vR = nodeParent[dfsInfo.vR];
         }
 
         return false;
@@ -597,25 +595,21 @@ int main()
 {
     int v_count, e_count;
     cin >> v_count >> e_count;
-    vector<pair<int, int>> nodes;
+    set<pair<int, int>> nodesSet;
     map<pair<int, int>, vector<pair<int, int>>> neighbors;
     map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges;
-    for (int i = 0; i < v_count; ++i)
-    {
-        int a, b;
-        cin >> a >> b;
-        nodes.push_back({a, b});
-        neighbors[{a, b}] = {};
-    }
     for (int i = 0; i < e_count; ++i)
     {
         int a, b, c, d;
         cin >> a >> b >> c >> d;
+        nodesSet.insert({a, b});
+        nodesSet.insert({c, d});
         neighbors[{a, b}].push_back({c, d});
         neighbors[{c, d}].push_back({a, b});
         edges[{a, b}][{c, d}]["use"] = UNUSED;
         edges[{a, b}][{c, d}]["visit"] = UNVISITED;
     }
+    vector<pair<int, int>> nodes(nodesSet.begin(), nodesSet.end());
     MicaliVazirani MV(nodes, neighbors, edges);
     map<pair<int, int>, pair<int, int>> mapping = MV.max_cardinality_matching();
     for (auto maps : mapping)
