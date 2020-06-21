@@ -3,6 +3,7 @@
         "vector": "cpp",
         "map": "cpp",
         "fstream": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "xtree": "cpp"
     }
 }

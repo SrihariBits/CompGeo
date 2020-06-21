@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-//Node Attributes
 #define UNERASED false
 #define ERASED true
 #define UNVISITED false
@@ -11,7 +10,7 @@ using namespace std;
 #define RIGHT 1
 #define UNUSED false
 #define USED true
-int INFNITY = 0;
+int INFNITY = INT_MAX;
 
 class Bloom
 {
@@ -43,28 +42,28 @@ public: //try to move this down
     pair<int, int> dcv;
     pair<int, int> barrier;
 
-    DfsInfo(pair<int, int> s, pair<int, int> t, pair<int, int> vL, pair<int, int> vR, pair<int, int> dcv, pair<int, int> barrier)
+    DfsInfo(pair<int, int> ss, pair<int, int> tt, pair<int, int> vLL, pair<int, int> vRR, pair<int, int> dcvv, pair<int, int> barrierr)
     {
-        s = s;
-        t = t;
-        vL = vL;
-        vR = vR;
-        dcv = dcv;
-        barrier = barrier;
+        s = ss;
+        t = tt;
+        vL = vLL;
+        vR = vRR;
+        dcv = dcvv;
+        barrier = barrierr;
     }
 };
 
 class MicaliVazirani
 {
+public:
     vector<pair<int, int>> nodes;
     map<pair<int, int>, vector<pair<int, int>>> neighbors; //all neightbors to a node
     map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges;
-    MicaliVazirani(vector<pair<int, int>> nodes, map<pair<int, int>, vector<pair<int, int>>> neighbors, map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges)
+    MicaliVazirani(vector<pair<int, int>> nodess, map<pair<int, int>, vector<pair<int, int>>> neighborss, map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edgess)
     {
-        nodes = nodes;
-        neighbors = neighbors;
-        edges = edges;
-        INFNITY = nodes.size() + 1; //correct?
+        nodes = nodess;
+        neighbors = neighborss;
+        edges = edgess;
     }
     map<pair<int, int>, int> nodeEvenLevel;
     map<pair<int, int>, int> nodeOddLevel;
@@ -76,11 +75,11 @@ class MicaliVazirani
     map<pair<int, int>, bool> nodeErase;
     map<pair<int, int>, bool> nodeVisit;
     map<pair<int, int>, bool> nodeMark;
-    map<pair<int, int>, pair<int, int>> nodeParent; //change def?
+    map<pair<int, int>, pair<int, int>> nodeParent;
 
     vector<pair<int, int>> bloomNodes;
     map<int, vector<pair<int, int>>> candidates;
-    map<int, set<pair<pair<int, int>, pair<int, int>>>> bridges; //change def?
+    map<int, set<pair<pair<int, int>, pair<int, int>>>> bridges;
 
     map<pair<int, int>, pair<int, int>> mate; //note all instances of != (none cases in python)
 
@@ -111,12 +110,14 @@ class MicaliVazirani
             {
                 for (auto v : e.second)
                 {
+                    if (e.first == v.first)
+                        continue;
                     edges[e.first][v.first]["use"] = UNUSED;
                     edges[e.first][v.first]["visit"] = UNVISITED;
                 }
             }
 
-            for (int i = 0; i < nodes.size() + 1; ++i)
+            for (int i = 0; i < nodes.size() + 1; ++i) //+1?
             {
                 candidates[i] = {};
                 bridges[i] = {};
@@ -124,8 +125,6 @@ class MicaliVazirani
 
             augmented = search();
         }
-
-        //delete stuff
 
         return mate;
     }
@@ -135,14 +134,14 @@ class MicaliVazirani
         int i = 0;
         for (auto v : nodes)
         {
-            if (mate.find(v) == mate.end())
+            if (mate.find(v) == mate.end()) //exposed vertex
             {
                 nodeEvenLevel[v] = 0;
                 candidates[0].push_back(v);
             }
         }
         bool augmented = false;
-        while (i < nodes.size() + 1 and !augmented)
+        while (i < nodes.size() + 1 and !augmented) //check empty candidiates?
         {
             if (i % 2 == 0)
             {
@@ -152,12 +151,15 @@ class MicaliVazirani
                     {
                         if (u == v)
                             continue;
-                        if (mate[v] != u and nodeErase[u] == UNERASED)
+                        if ((mate.find(v) == mate.end() or mate[v] != u) and nodeErase[u] == UNERASED)
                         {
                             if (nodeEvenLevel[u] < INFNITY)
                             {
                                 int j = (nodeEvenLevel[u] + nodeEvenLevel[v]) / 2;
-                                bridges[j].insert({u, v}); //supposed to be sorted
+                                if (u <= v)
+                                    bridges[j].insert({u, v});
+                                else
+                                    bridges[j].insert({v, u});
                             }
                             else
                             {
@@ -185,6 +187,11 @@ class MicaliVazirani
                 {
                     if (!nodeBloom[v].isDefined())
                     {
+                        if (mate.find(v) == mate.end())
+                        {
+                            cout << "Improper Input"; //case should not happen!
+                            return true;
+                        }
                         pair<int, int> u = mate[v];
                         if (nodeOddLevel[u] < INFNITY)
                         {
@@ -239,7 +246,7 @@ class MicaliVazirani
         bloomNodes.push_back(vL);
         bloomNodes.push_back(vR);
 
-        DfsInfo dfsInfo(s, t, vL, vR, None, vR); //what is dcv aka none?
+        DfsInfo dfsInfo(s, t, vL, vR, None, vR);
 
         while (!foundBloom and !augmented)
         {
@@ -248,7 +255,7 @@ class MicaliVazirani
             int level_vL = min(nodeEvenLevel[dfsInfo.vL], nodeOddLevel[dfsInfo.vL]);
             int level_vR = min(nodeEvenLevel[dfsInfo.vR], nodeOddLevel[dfsInfo.vR]);
 
-            if (mate.find(dfsInfo.vL) == mate.end() and mate.find(dfsInfo.vR) == mate.end())
+            if (mate.find(dfsInfo.vL) == mate.end() and mate.find(dfsInfo.vR) == mate.end()) //both exposed
             {
                 vector<pair<int, int>> pathL = findPath(dfsInfo.s, dfsInfo.vL, none);
                 vector<pair<int, int>> pathR = findPath(dfsInfo.t, dfsInfo.vR, none);
@@ -276,24 +283,27 @@ class MicaliVazirani
             b.base = dfsInfo.dcv;
             b.setDefined();
 
-            for (auto v : bloomNodes)
+            for (auto y : bloomNodes)
             {
-                if (nodeMark[v] == UNMARKED or !nodeBloom[v].isDefined())
+                if (nodeMark[y] == UNMARKED or nodeBloom[y].isDefined())
                     continue;
-                nodeBloom[v] = b;
+                nodeBloom[y] = b;
 
-                int level_v = min(nodeEvenLevel[v], nodeOddLevel[v]);
-                if (level_v % 2 == 0)
-                    nodeOddLevel[v] = 2 * i + 1 - nodeEvenLevel[v];
-                else
+                int level_y = min(nodeEvenLevel[y], nodeOddLevel[y]);
+                if (level_y % 2 == 0) //outer
+                    nodeOddLevel[y] = 2 * i + 1 - nodeEvenLevel[y];
+                else //inner
                 {
-                    nodeEvenLevel[v] = 2 * i + 1 - nodeOddLevel[v];
-                    candidates[nodeEvenLevel[v]].push_back(v);
-                    for (auto z : nodeAnomalies[v])
+                    nodeEvenLevel[y] = 2 * i + 1 - nodeOddLevel[y];
+                    candidates[nodeEvenLevel[y]].push_back(y);
+                    for (auto z : nodeAnomalies[y])
                     {
-                        int j = (nodeEvenLevel[v] + nodeEvenLevel[z]) / 2;
-                        bridges[j].insert({v, z}); //wrong?
-                        edges[v][z]["use"] = USED;
+                        int j = (nodeEvenLevel[y] + nodeEvenLevel[z]) / 2;
+                        if (y <= z)
+                            bridges[j].insert({y, z});
+                        else
+                            bridges[j].insert({z, y});
+                        edges[y][z]["use"] = USED;
                     }
                 }
             }
@@ -354,7 +364,7 @@ class MicaliVazirani
         while (firstv != lv)
         {
             secondv = nodeParent[firstv];
-            if (mate[secondv] != firstv)
+            if (mate.find(secondv) == mate.end() or mate[secondv] != firstv)
             {
                 mate[firstv] = secondv;
                 mate[secondv] = firstv;
@@ -363,29 +373,29 @@ class MicaliVazirani
         }
     }
 
-    bool leftDfs(DfsInfo dfsInfo)
+    bool leftDfs(DfsInfo &dfsInfo)
     {
-        for (auto uL : nodePredecessors[dfsInfo.vL])
+        for (auto u : nodePredecessors[dfsInfo.vL])
         {
-            if (edges[dfsInfo.vL][uL]["use"] == USED or nodeErase[uL] == ERASED)
+            if (edges[dfsInfo.vL][u]["use"] == USED or nodeErase[u] == ERASED)
                 continue;
 
-            edges[dfsInfo.vL][uL]["use"] = USED;
+            edges[dfsInfo.vL][u]["use"] = USED;
 
-            if (nodeBloom[uL].isDefined())
-                uL = baseStar(uL);
+            if (nodeBloom[u].isDefined())
+                u = baseStar(u);
 
-            if (nodeMark[uL] == UNMARKED)
+            if (nodeMark[u] == UNMARKED)
             {
-                nodeMark[uL] = LEFT;
-                nodeParent[uL] = dfsInfo.vL;
-                dfsInfo.vL = uL;
-                bloomNodes.push_back(uL);
+                nodeMark[u] = LEFT;
+                nodeParent[u] = dfsInfo.vL;
+                dfsInfo.vL = u;
+                bloomNodes.push_back(u);
                 return false;
             }
-            else if (uL == dfsInfo.vR)
+            else if (u == dfsInfo.vR) //required?
             {
-                dfsInfo.dcv = uL;
+                dfsInfo.dcv = u;
             }
         }
 
@@ -399,29 +409,29 @@ class MicaliVazirani
         return false;
     }
 
-    bool rightDfs(DfsInfo dfsInfo)
+    bool rightDfs(DfsInfo &dfsInfo)
     {
-        for (auto uR : nodePredecessors[dfsInfo.vR])
+        for (auto u : nodePredecessors[dfsInfo.vR])
         {
-            if (edges[dfsInfo.vR][uR]["use"] == USED or nodeErase[uR] == ERASED)
+            if (edges[dfsInfo.vR][u]["use"] == USED or nodeErase[u] == ERASED)
                 continue;
 
-            edges[dfsInfo.vR][uR]["use"] = USED;
+            edges[dfsInfo.vR][u]["use"] = USED;
 
-            if (nodeBloom[uR].isDefined())
-                uR = baseStar(uR);
+            if (nodeBloom[u].isDefined())
+                u = baseStar(u);
 
-            if (nodeMark[uR] == UNMARKED)
+            if (nodeMark[u] == UNMARKED)
             {
-                nodeMark[uR] = RIGHT;
-                nodeParent[uR] = dfsInfo.vR;
-                dfsInfo.vR = uR;
-                bloomNodes.push_back(uR);
+                nodeMark[u] = RIGHT;
+                nodeParent[u] = dfsInfo.vR;
+                dfsInfo.vR = u;
+                bloomNodes.push_back(u);
                 return false;
             }
-            else if (uR == dfsInfo.vL)
+            else if (u == dfsInfo.vL)
             {
-                dfsInfo.dcv = uR;
+                dfsInfo.dcv = u;
             }
         }
 
@@ -443,7 +453,7 @@ class MicaliVazirani
         return false;
     }
 
-    void erasePath(vector<pair<int, int>> path)
+    void erasePath(vector<pair<int, int>> &path)
     {
         while (path.size() > 0)
         {
@@ -514,37 +524,39 @@ class MicaliVazirani
         {
             path.push_back(u);
             u = nodeParent[u];
-            reverse(path.begin(), path.end());
+        }
+        path.push_back(u);
+        reverse(path.begin(), path.end());
 
-            int j = 0;
-            while (j <= path.size() - 1)
+        int j = 0;
+        while (j <= path.size() - 1)
+        {
+            pair<int, int> xj = path[j];
+
+            if (nodeBloom[xj].isDefined() and (nodeBloom[xj].peaks != b.peaks and nodeBloom[xj].base != b.base))
             {
-                pair<int, int> xj = path[j];
-
-                if (!nodeBloom[xj].isDefined() and (nodeBloom[xj].peaks != b.peaks and nodeBloom[xj].base != b.base))
-                {
-                    nodeVisit[xj] = UNVISITED;
-                    vector<pair<int, int>> temp = openBloom(xj);
-                    int pathLength = temp.size();
-                    path.erase(path.begin() + j, path.begin() + j + 2);
-                    path.insert(path.begin() + j, temp.begin(), temp.end());
-                    nodeParent[xj] = j > 0 ? path[j - 1] : None;
-                    j += pathLength - 1;
-                }
-                ++j;
+                nodeVisit[xj] = UNVISITED;
+                vector<pair<int, int>> temp = openBloom(xj);
+                int pathLength = temp.size();
+                path.erase(path.begin() + j, path.begin() + j + 2);
+                path.insert(path.begin() + j, temp.begin(), temp.end());
+                nodeParent[xj] = j > 0 ? path[j - 1] : None;
+                j += pathLength - 1;
             }
+            ++j;
         }
         return path;
     }
 
-    vector<pair<int, int>> openBloom(pair<int, int> x)
+    vector<pair<int, int>>
+    openBloom(pair<int, int> x)
     {
         Bloom bloom = nodeBloom[x];
         pair<int, int> base = bloom.base;
         int level_x = min(nodeEvenLevel[x], nodeOddLevel[x]);
         vector<pair<int, int>> path;
 
-        if (level_x % 2 == 0)
+        if (level_x % 2 == 0) //outer
         {
             path = findPath(x, base, bloom);
         }
@@ -580,3 +592,35 @@ class MicaliVazirani
         return base;
     }
 };
+
+int main()
+{
+    int v_count, e_count;
+    cin >> v_count >> e_count;
+    vector<pair<int, int>> nodes;
+    map<pair<int, int>, vector<pair<int, int>>> neighbors;
+    map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges;
+    for (int i = 0; i < v_count; ++i)
+    {
+        int a, b;
+        cin >> a >> b;
+        nodes.push_back({a, b});
+        neighbors[{a, b}] = {};
+    }
+    for (int i = 0; i < e_count; ++i)
+    {
+        int a, b, c, d;
+        cin >> a >> b >> c >> d;
+        neighbors[{a, b}].push_back({c, d});
+        neighbors[{c, d}].push_back({a, b});
+        edges[{a, b}][{c, d}]["use"] = UNUSED;
+        edges[{a, b}][{c, d}]["visit"] = UNVISITED;
+    }
+    MicaliVazirani MV(nodes, neighbors, edges);
+    map<pair<int, int>, pair<int, int>> mapping = MV.max_cardinality_matching();
+    for (auto maps : mapping)
+    {
+        cout << "\n(" << maps.first.first << "," << maps.first.second << ") = > (" << maps.second.first << "," << maps.second.second << ")";
+    }
+    return 0;
+}
