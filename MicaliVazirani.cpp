@@ -509,7 +509,7 @@ public:
             else
             {
                 int level_u = min(nodeEvenLevel[u], nodeOddLevel[u]);
-                if (nodeErase[u] == UNERASED and level_u >= level_low and (u == low or (nodeVisit[u] == UNVISITED and (nodeMark[u] == nodeMark[high] != UNMARKED or (!nodeBloom[u].isDefined() and (nodeBloom[u].peaks != b.peaks and nodeBloom[u].base != b.base))))))
+                if (nodeErase[u] == UNERASED and level_u >= level_low and (u == low or (nodeVisit[u] == UNVISITED and (nodeMark[u] == nodeMark[high] != UNMARKED or (nodeBloom[u].isDefined() and (nodeBloom[u].peaks != b.peaks and nodeBloom[u].base != b.base))))))
                 {
                     nodeVisit[u] = VISITED;
                     nodeParent[u] = v;
@@ -527,7 +527,7 @@ public:
         reverse(path.begin(), path.end());
 
         int j = 0;
-        while (j <= path.size() - 1)
+        while (j < path.size() - 1)
         {
             pair<int, int> xj = path[j];
 
@@ -593,8 +593,8 @@ public:
 
 int main()
 {
-    int v_count, e_count;
-    cin >> v_count >> e_count;
+    int e_count;
+    cin >> e_count;
     set<pair<int, int>> nodesSet;
     map<pair<int, int>, vector<pair<int, int>>> neighbors;
     map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges;
