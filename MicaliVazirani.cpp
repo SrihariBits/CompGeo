@@ -11,14 +11,14 @@ using namespace std;
 #define UNUSED false
 #define USED true
 int INFNITY = INT_MAX;
-
+pair<int, int> None = {INT_MIN, INT_MIN};
 class Bloom
 {
 
 public:
     bool defined = false;
-    pair<pair<int, int>, pair<int, int>> peaks;
-    pair<int, int> base;
+    pair<pair<int, int>, pair<int, int>> peaks = {None, None};
+    pair<int, int> base = None;
     bool isDefined()
     {
         return defined;
@@ -29,7 +29,6 @@ public:
     }
 };
 
-pair<int, int> None = {INT_MIN, INT_MIN};
 Bloom none;
 
 class DfsInfo
@@ -79,7 +78,7 @@ public:
 
     vector<pair<int, int>> bloomNodes;
     map<int, vector<pair<int, int>>> candidates;
-    map<int, set<pair<pair<int, int>, pair<int, int>>>> bridges;
+    map<int, set<pair<pair<int, int>, pair<int, int>>, less<pair<pair<int, int>, pair<int, int>>>>> bridges;
 
     map<pair<int, int>, pair<int, int>> mate; //note all instances of != (none cases in python)
 
@@ -195,7 +194,6 @@ public:
                         if (nodeOddLevel[u] < INFNITY)
                         {
                             int j = (nodeOddLevel[u] + nodeOddLevel[v]) / 2;
-                            cout<<u.first<<v.first<<"\n";
                             if (u <= v)
                                 bridges[j].insert({u, v});
                             else
@@ -366,8 +364,6 @@ public:
         while (firstv != lv)
         {
             secondv = nodeParent[firstv];
-            if (secondv == None)
-                cout << "nooooo1";
             if (mate.find(secondv) == mate.end() or mate[secondv] != firstv)
             {
                 mate[firstv] = secondv;
@@ -468,10 +464,11 @@ public:
             for (auto z : nodeSuccessors[y])
             {
                 if (nodeErase[z] == UNERASED)
+                {
                     nodeCount[z] -= 1;
-
-                if (nodeCount[z] == 0)
-                    path.push_back(z);
+                    if (nodeCount[z] == 0)
+                        path.push_back(z);
+                }
             }
         }
     }
@@ -601,16 +598,13 @@ int main()
 {
     int e_count;
     cin >> e_count;
-    //set<pair<int,int>> nodesSet;
-    vector<pair<int, int>> nodes; //(nodesSet.begin(),nodesSet.end());
+    vector<pair<int, int>> nodes;
     map<pair<int, int>, vector<pair<int, int>>> neighbors;
     map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges;
     for (int i = 0; i < e_count; ++i)
     {
         int a, b, c, d;
         cin >> a >> b >> c >> d;
-        //nodesSet.insert({a,b});
-        //nodesSet.insert({c,d});
         if (find(nodes.begin(), nodes.end(), make_pair(a, b)) == nodes.end())
             nodes.push_back({a, b});
         if (find(nodes.begin(), nodes.end(), make_pair(c, d)) == nodes.end())
@@ -620,8 +614,6 @@ int main()
         edges[{a, b}][{c, d}]["use"] = UNUSED;
         edges[{a, b}][{c, d}]["visit"] = UNVISITED;
     }
-    /*for (auto x : nodes)
-        cout << x.first << x.second << " ";*/
     MicaliVazirani MV(nodes, neighbors, edges);
     map<pair<int, int>, pair<int, int>> mapping = MV.max_cardinality_matching();
     for (auto maps : mapping)
