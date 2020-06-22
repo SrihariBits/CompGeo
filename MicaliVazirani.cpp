@@ -74,7 +74,7 @@ public:
     map<pair<int, int>, int> nodeCount;
     map<pair<int, int>, bool> nodeErase;
     map<pair<int, int>, bool> nodeVisit;
-    map<pair<int, int>, bool> nodeMark;
+    map<pair<int, int>, int> nodeMark;
     map<pair<int, int>, pair<int, int>> nodeParent;
 
     vector<pair<int, int>> bloomNodes;
@@ -195,7 +195,11 @@ public:
                         if (nodeOddLevel[u] < INFNITY)
                         {
                             int j = (nodeOddLevel[u] + nodeOddLevel[v]) / 2;
-                            bridges[j].insert({u, v}); //wrong?
+                            cout<<u.first<<v.first<<"\n";
+                            if (u <= v)
+                                bridges[j].insert({u, v});
+                            else
+                                bridges[j].insert({v, u});
                         }
                         else if (nodeEvenLevel[u] == INFNITY)
                         {
@@ -310,7 +314,7 @@ public:
         return augmented;
     }
 
-    vector<pair<int, int>> connectPath(vector<pair<int, int>> pathL, vector<pair<int, int>> pathR, pair<int, int> s, pair<int, int> t)
+    vector<pair<int, int>> connectPath(vector<pair<int, int>> &pathL, vector<pair<int, int>> &pathR, pair<int, int> s, pair<int, int> t)
     {
         bool reverseL = s == pathL[0] ? true : false;
         bool reverseR = t == pathR[pathR.size() - 1] ? true : false;
@@ -362,6 +366,8 @@ public:
         while (firstv != lv)
         {
             secondv = nodeParent[firstv];
+            if (secondv == None)
+                cout << "nooooo1";
             if (mate.find(secondv) == mate.end() or mate[secondv] != firstv)
             {
                 mate[firstv] = secondv;
@@ -482,6 +488,7 @@ public:
         pair<int, int> u = high;
         while (u != low)
         {
+
             bool hasUnvisitedPredecessor = false;
 
             for (auto p : nodePredecessors[v])
@@ -517,7 +524,6 @@ public:
                 }
             }
         }
-
         while (u != high)
         {
             path.push_back(u);
@@ -595,21 +601,27 @@ int main()
 {
     int e_count;
     cin >> e_count;
-    set<pair<int, int>> nodesSet;
+    //set<pair<int,int>> nodesSet;
+    vector<pair<int, int>> nodes; //(nodesSet.begin(),nodesSet.end());
     map<pair<int, int>, vector<pair<int, int>>> neighbors;
     map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges;
     for (int i = 0; i < e_count; ++i)
     {
         int a, b, c, d;
         cin >> a >> b >> c >> d;
-        nodesSet.insert({a, b});
-        nodesSet.insert({c, d});
+        //nodesSet.insert({a,b});
+        //nodesSet.insert({c,d});
+        if (find(nodes.begin(), nodes.end(), make_pair(a, b)) == nodes.end())
+            nodes.push_back({a, b});
+        if (find(nodes.begin(), nodes.end(), make_pair(c, d)) == nodes.end())
+            nodes.push_back({c, d});
         neighbors[{a, b}].push_back({c, d});
         neighbors[{c, d}].push_back({a, b});
         edges[{a, b}][{c, d}]["use"] = UNUSED;
         edges[{a, b}][{c, d}]["visit"] = UNVISITED;
     }
-    vector<pair<int, int>> nodes(nodesSet.begin(), nodesSet.end());
+    /*for (auto x : nodes)
+        cout << x.first << x.second << " ";*/
     MicaliVazirani MV(nodes, neighbors, edges);
     map<pair<int, int>, pair<int, int>> mapping = MV.max_cardinality_matching();
     for (auto maps : mapping)
