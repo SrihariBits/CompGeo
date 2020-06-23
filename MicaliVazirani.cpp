@@ -1,5 +1,30 @@
 #include <bits/stdc++.h>
 using namespace std;
+template <class T>
+class VectorSet
+{
+public:
+    using iterator = typename vector<T>::iterator;
+    using const_iterator = typename vector<T>::const_iterator;
+    iterator begin() { return Vector.begin(); }
+    iterator end() { return Vector.end(); }
+    const_iterator begin() const { return Vector.begin(); }
+    const_iterator end() const { return Vector.end(); }
+    const T &front() const { return Vector.front(); }
+    const T &back() const { return Vector.back(); }
+    void insert(const T &item)
+    {
+        if (Set.insert(item).second)
+            Vector.push_back(item);
+    }
+    size_t count(const T &item) const { return Set.count(item); }
+    bool empty() const { return Set.empty(); }
+    size_t size() const { return Set.size(); }
+
+private:
+    vector<T> Vector;
+    set<T> Set;
+};
 
 #define UNERASED false
 #define ERASED true
@@ -12,6 +37,7 @@ using namespace std;
 #define USED true
 int INFNITY = INT_MAX;
 pair<int, int> None = {INT_MIN, INT_MIN};
+
 class Bloom
 {
 
@@ -78,7 +104,7 @@ public:
 
     vector<pair<int, int>> bloomNodes;
     map<int, vector<pair<int, int>>> candidates;
-    map<int, set<pair<pair<int, int>, pair<int, int>>, less<pair<pair<int, int>, pair<int, int>>>>> bridges;
+    map<int, VectorSet<pair<pair<int, int>, pair<int, int>>>> bridges;
 
     map<pair<int, int>, pair<int, int>> mate; //note all instances of != (none cases in python)
 
@@ -533,7 +559,6 @@ public:
         while (j < path.size() - 1)
         {
             pair<int, int> xj = path[j];
-
             if (nodeBloom[xj].isDefined() and (nodeBloom[xj].peaks != b.peaks and nodeBloom[xj].base != b.base))
             {
                 nodeVisit[xj] = UNVISITED;
@@ -565,19 +590,19 @@ public:
         {
             pair<int, int> leftPeak = bloom.peaks.first;
             pair<int, int> rightPeak = bloom.peaks.second;
-
             if (nodeMark[x] == LEFT)
             {
+
                 vector<pair<int, int>> pathLeft = findPath(leftPeak, x, bloom);
                 vector<pair<int, int>>
                     pathRight = findPath(rightPeak, base, bloom);
-                vector<pair<int, int>> path = connectPath(pathLeft, pathRight, leftPeak, rightPeak);
+                path = connectPath(pathLeft, pathRight, leftPeak, rightPeak);
             }
             else if (nodeMark[x] == RIGHT)
             {
                 vector<pair<int, int>> pathLeft = findPath(rightPeak, x, bloom);
                 vector<pair<int, int>> pathRight = findPath(leftPeak, base, bloom);
-                vector<pair<int, int>> path = connectPath(pathLeft, pathRight, rightPeak, leftPeak);
+                path = connectPath(pathLeft, pathRight, rightPeak, leftPeak);
             }
         }
         return path;
