@@ -1,0 +1,75 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage{titlesec}
+\setcounter{secnumdepth}{4}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage[headheight=65pt,tmargin=65pt,headsep=5pt]{geometry}
+\newcommand{\etal}{\textit{et al.}}
+\usepackage{hyperref}
+
+
+\title{%
+ \LARGE  CS F402 Computational Geometry
+\newline
+\newline
+\LARGE Programming Project\\
+\Large Euclidean K-Supplier Problem
+}
+
+\author{%
+ \begin{tabular}{c} \small Raj Kashyap\\ \small Mallala\\ \small2017A7PS0025H \end{tabular}\and
+ \begin{tabular}{c} \small L Srihari\\ \small2017A7PS1670H \end{tabular}\and
+ \begin{tabular}{c}\small T Naga Sai\\ \small Bharath\\ \small2017A7PS0209H \end{tabular}
+}
+\date{June 2020}
+
+\begin{document}
+\maketitle
+\section{Problem Statement}
+Given a set \textbf{\textit{F}} of \textbf{\textit{m}} points and another set \textbf{\textit{C}} of \textbf{\textit{n}} points in the plane, the objective is to open a set $\textbf{\textit{F}}’$ $\subseteq$ \textbf{\textit{F}} of \textbf{\textit{k}} facilities such that the maximum distance of any client in \textbf{\textit{C}} to its nearest open facility in \textbf{\textit{F}}’ is minimized. The distances between the points satisfy two properties: symmetry (i.e. d(u,v) = d(v,u) for all $u,v \in \textbf{\textit{F}} \cup \textbf{\textit{C}}$) and triangle inequality (i.e $d(u,v)+d(v,w) \geq d(u,w)$ for all $u,v,w  \in \textbf{\textit{F}} \cup \textbf{\textit{C}}$)\\
+
+Let $d(f,\textbf{\textit{F}}’)$ = minimum distance from point f to g where g is any point in  \textbf{\textit{F}}'. Then,
+\begin{equation} d(f,\textbf{\textit{F}}’) = \emph{min}\;d(f,g) : g \in \textbf{\textit{F}}’\end{equation}
+The given problem can be expressed as,\begin{center}\textbf{minimize} $max\;d(f,$\textbf{\textit{F}}’$)$, where\end{center}
+$\;$\textit{f} $\in$  \textbf{\textit{C}} and $\textbf{\textit{F}}'$ $\subseteq$ \textbf{\textit{F}} such that $| \textbf{\textit{F}}' | = \textbf{\textit{k}}$\\
+
+\section{Introduction}
+Multiple applications of the euclidean K-supplier problem can be found. One obvious application is in the domain of facility location in supply - chain markets and businesses, commonly observed in large supermarket chains. Here the consumer outlets form the set \textbf{\textit{C}} and locations of potential intermediate suppliers form the set  \textbf{\textit{F}}.\\
+Other applications include opening hospitals in a city with limited capacities, opening of centres for the disposal of obnoxious substances, setting up servers in a network, data mining and information retrieval such as data clustering.\\
+
+\section{About the paper in concern}
+
+\section{Results}
+The $(1+\sqrt{3})$ approximation Euclidean k-Supplier algorithm proposed in \cite{EuclideanKS} has two major sub-routines, namely, An algorithm for ﬁnding maximum matching in general graphs \cite{MicaliVazirani}) and An optimal algorithm for approximate nearest neighbor searching in ﬁxed dimensions, which are by themselves well researched in the algorithmic domain (Sunil Arya and David M. Mount \cite{ANN}). In this programming assignment, the first major subroutine on Maximum Matching, also known the MV algorithm, has been programmed from the scratch based on the algorithmic exposition given by Paul A. Peterson and Michael C. Loui \cite{Exposition}. The second major subroutine on Approximate nearest neighbors has been implemented with the aid of the ANN library provided for public use by the authors themselves \cite{ANNLibrary}. The complete coding was done in C plus plus programming language. As the performance and correctness of the subroutines are crucial for efficient working of the main algorithm, we provide the results of unit tests on these sub routines first. The unit tests are followed by results of the complete algorithm.\\
+\subsection{Unit test on component Algorithms}
+\subsubsection{Maximum Matching Algorithm (MicaliVazirani.cpp)}
+\subsubsection{Approximate nearest neighbour search}
+
+\begin{thebibliography}{1}
+
+\bibitem{EuclideanKS} 
+Viswanath Nagarajan, Baruch Schieber, and Hadas Shachnai
+\textit{The Euclidean k-Supplier Problem}.
+Integer Programming and Combinatorial Optimization. IPCO 2013.
+
+\bibitem{MicaliVazirani} 
+ Silvio Micali, Vijay V. Vazirani
+\textit{An algorithm for ﬁnding maximum matching in general graphs}.
+21st Annual Symposium on Foundations of Computer Science (sfcs 1980)
+
+\bibitem{Exposition} 
+Paul A. Peterson, Michael C. Loui
+\textit{The general maximum matching algorithm of micali and vazirani}.
+Algorithmica 3, 511–533 (1988). https://doi.org/10.1007/BF01762129
+
+\bibitem{ANN} 
+Sunil Arya, David M. Mount
+\textit{Approximate nearest neighbor queries in fixed dimensions}.
+SODA '93: Proceedings of the fourth annual ACM-SIAM symposium on Discrete algorithms, January 1993
+
+\bibitem{ANNLibrary} 
+Sunil Arya, David M. Mount
+\textit{ANN: A Library for Approximate Nearest Neighbor Searching}.
+http://www.cs.umd.edu/~mount/ANN/
+\end{thebibliography}
+\end{document}
