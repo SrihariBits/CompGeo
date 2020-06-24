@@ -1,5 +1,30 @@
 #include <bits/stdc++.h>
 using namespace std;
+template <class T>
+class VectorSet
+{
+public:
+    using iterator = typename vector<T>::iterator;
+    using const_iterator = typename vector<T>::const_iterator;
+    iterator begin() { return Vector.begin(); }
+    iterator end() { return Vector.end(); }
+    const_iterator begin() const { return Vector.begin(); }
+    const_iterator end() const { return Vector.end(); }
+    const T &front() const { return Vector.front(); }
+    const T &back() const { return Vector.back(); }
+    void insert(const T &item)
+    {
+        if (Set.insert(item).second)
+            Vector.push_back(item);
+    }
+    size_t count(const T &item) const { return Set.count(item); }
+    bool empty() const { return Set.empty(); }
+    size_t size() const { return Set.size(); }
+
+private:
+    vector<T> Vector;
+    set<T> Set;
+};
 
 #define UNERASED false
 #define ERASED true
@@ -11,14 +36,15 @@ using namespace std;
 #define UNUSED false
 #define USED true
 int INFNITY = INT_MAX;
+pair<int, int> None = {INT_MIN, INT_MIN};
 
 class Bloom
 {
 
 public:
     bool defined = false;
-    pair<pair<int, int>, pair<int, int>> peaks;
-    pair<int, int> base;
+    pair<pair<int, int>, pair<int, int>> peaks = {None, None};
+    pair<int, int> base = None;
     bool isDefined()
     {
         return defined;
@@ -29,7 +55,6 @@ public:
     }
 };
 
-pair<int, int> None = {INT_MIN, INT_MIN};
 Bloom none;
 
 class DfsInfo
@@ -74,12 +99,12 @@ public:
     map<pair<int, int>, int> nodeCount;
     map<pair<int, int>, bool> nodeErase;
     map<pair<int, int>, bool> nodeVisit;
-    map<pair<int, int>, bool> nodeMark;
+    map<pair<int, int>, int> nodeMark;
     map<pair<int, int>, pair<int, int>> nodeParent;
 
     vector<pair<int, int>> bloomNodes;
     map<int, vector<pair<int, int>>> candidates;
-    map<int, set<pair<pair<int, int>, pair<int, int>>>> bridges;
+    map<int, VectorSet<pair<pair<int, int>, pair<int, int>>>> bridges;
 
     map<pair<int, int>, pair<int, int>> mate; //note all instances of != (none cases in python)
 
@@ -195,7 +220,10 @@ public:
                         if (nodeOddLevel[u] < INFNITY)
                         {
                             int j = (nodeOddLevel[u] + nodeOddLevel[v]) / 2;
-                            bridges[j].insert({u, v}); //wrong?
+                            if (u <= v)
+                                bridges[j].insert({u, v});
+                            else
+                                bridges[j].insert({v, u});
                         }
                         else if (nodeEvenLevel[u] == INFNITY)
                         {
@@ -310,7 +338,7 @@ public:
         return augmented;
     }
 
-    vector<pair<int, int>> connectPath(vector<pair<int, int>> pathL, vector<pair<int, int>> pathR, pair<int, int> s, pair<int, int> t)
+    vector<pair<int, int>> connectPath(vector<pair<int, int>> &pathL, vector<pair<int, int>> &pathR, pair<int, int> s, pair<int, int> t)
     {
         bool reverseL = s == pathL[0] ? true : false;
         bool reverseR = t == pathR[pathR.size() - 1] ? true : false;
@@ -462,10 +490,11 @@ public:
             for (auto z : nodeSuccessors[y])
             {
                 if (nodeErase[z] == UNERASED)
+                {
                     nodeCount[z] -= 1;
-
-                if (nodeCount[z] == 0)
-                    path.push_back(z);
+                    if (nodeCount[z] == 0)
+                        path.push_back(z);
+                }
             }
         }
     }
@@ -482,6 +511,7 @@ public:
         pair<int, int> u = high;
         while (u != low)
         {
+
             bool hasUnvisitedPredecessor = false;
 
             for (auto p : nodePredecessors[v])
@@ -509,7 +539,7 @@ public:
             else
             {
                 int level_u = min(nodeEvenLevel[u], nodeOddLevel[u]);
-                if (nodeErase[u] == UNERASED and level_u >= level_low and (u == low or (nodeVisit[u] == UNVISITED and (nodeMark[u] == nodeMark[high] != UNMARKED or (!nodeBloom[u].isDefined() and (nodeBloom[u].peaks != b.peaks and nodeBloom[u].base != b.base))))))
+                if (nodeErase[u] == UNERASED and level_u >= level_low and (u == low or (nodeVisit[u] == UNVISITED and (nodeMark[u] == nodeMark[high] != UNMARKED or (nodeBloom[u].isDefined() and (nodeBloom[u].peaks != b.peaks and nodeBloom[u].base != b.base))))))
                 {
                     nodeVisit[u] = VISITED;
                     nodeParent[u] = v;
@@ -517,7 +547,6 @@ public:
                 }
             }
         }
-
         while (u != high)
         {
             path.push_back(u);
@@ -527,10 +556,9 @@ public:
         reverse(path.begin(), path.end());
 
         int j = 0;
-        while (j <= path.size() - 1)
+        while (j < path.size() - 1)
         {
             pair<int, int> xj = path[j];
-
             if (nodeBloom[xj].isDefined() and (nodeBloom[xj].peaks != b.peaks and nodeBloom[xj].base != b.base))
             {
                 nodeVisit[xj] = UNVISITED;
@@ -562,19 +590,19 @@ public:
         {
             pair<int, int> leftPeak = bloom.peaks.first;
             pair<int, int> rightPeak = bloom.peaks.second;
-
             if (nodeMark[x] == LEFT)
             {
+
                 vector<pair<int, int>> pathLeft = findPath(leftPeak, x, bloom);
                 vector<pair<int, int>>
                     pathRight = findPath(rightPeak, base, bloom);
-                vector<pair<int, int>> path = connectPath(pathLeft, pathRight, leftPeak, rightPeak);
+                path = connectPath(pathLeft, pathRight, leftPeak, rightPeak);
             }
             else if (nodeMark[x] == RIGHT)
             {
                 vector<pair<int, int>> pathLeft = findPath(rightPeak, x, bloom);
                 vector<pair<int, int>> pathRight = findPath(leftPeak, base, bloom);
-                vector<pair<int, int>> path = connectPath(pathLeft, pathRight, rightPeak, leftPeak);
+                path = connectPath(pathLeft, pathRight, rightPeak, leftPeak);
             }
         }
         return path;
@@ -593,23 +621,24 @@ public:
 
 int main()
 {
-    int v_count, e_count;
-    cin >> v_count >> e_count;
-    set<pair<int, int>> nodesSet;
+    int e_count;
+    cin >> e_count;
+    vector<pair<int, int>> nodes;
     map<pair<int, int>, vector<pair<int, int>>> neighbors;
     map<pair<int, int>, map<pair<int, int>, map<string, bool>>> edges;
     for (int i = 0; i < e_count; ++i)
     {
         int a, b, c, d;
         cin >> a >> b >> c >> d;
-        nodesSet.insert({a, b});
-        nodesSet.insert({c, d});
+        if (find(nodes.begin(), nodes.end(), make_pair(a, b)) == nodes.end())
+            nodes.push_back({a, b});
+        if (find(nodes.begin(), nodes.end(), make_pair(c, d)) == nodes.end())
+            nodes.push_back({c, d});
         neighbors[{a, b}].push_back({c, d});
         neighbors[{c, d}].push_back({a, b});
         edges[{a, b}][{c, d}]["use"] = UNUSED;
         edges[{a, b}][{c, d}]["visit"] = UNVISITED;
     }
-    vector<pair<int, int>> nodes(nodesSet.begin(), nodesSet.end());
     MicaliVazirani MV(nodes, neighbors, edges);
     map<pair<int, int>, pair<int, int>> mapping = MV.max_cardinality_matching();
     for (auto maps : mapping)
