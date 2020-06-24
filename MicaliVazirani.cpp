@@ -640,11 +640,11 @@ int main()
         edges[{a, b}][{c, d}]["use"] = UNUSED;
         edges[{a, b}][{c, d}]["visit"] = UNVISITED;
     }
-    auto t1 = std::chrono::high_resolution_clock::now();
+    auto t1 = high_resolution_clock::now();
     MicaliVazirani MV(nodes, neighbors, edges);
     map<pair<int, int>, pair<int, int>> mapping = MV.general_matching_algorithm();
-    auto t2 = std::chrono::high_resolution_clock::now();
-    auto int_ms = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+    auto t2 = high_resolution_clock::now();
+    auto int_ms = duration_cast<std::chrono::microseconds>(t2 - t1);
     for (auto maps : mapping)
     {
         cout << "\n(" << maps.first.first << "," << maps.first.second << ") = > (" << maps.second.first << "," << maps.second.second << ")";
