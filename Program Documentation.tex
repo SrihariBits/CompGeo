@@ -3,10 +3,19 @@
 \setcounter{secnumdepth}{4}
 \usepackage[utf8]{inputenc}
 \usepackage{fancyhdr}
-\usepackage[headheight=65pt,tmargin=65pt,headsep=5pt]{geometry}
 \newcommand{\etal}{\textit{et al.}}
 \usepackage{hyperref}
-
+\usepackage{listings}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{longtable}
+\graphicspath{ {./images/} }
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
 
 \title{%
  \LARGE  CS F402 Computational Geometry
@@ -26,7 +35,7 @@
 \begin{document}
 \maketitle
 \section{Problem Statement}
-Given a set \textbf{\textit{F}} of \textbf{\textit{m}} points and another set \textbf{\textit{C}} of \textbf{\textit{n}} points in the plane, the objective is to open a set $\textbf{\textit{F}}’$ $\subseteq$ \textbf{\textit{F}} of \textbf{\textit{k}} facilities such that the maximum distance of any client in \textbf{\textit{C}} to its nearest open facility in \textbf{\textit{F}}’ is minimized. The distances between the points satisfy two properties: symmetry (i.e. d(u,v) = d(v,u) for all $u,v \in \textbf{\textit{F}} \cup \textbf{\textit{C}}$) and triangle inequality (i.e $d(u,v)+d(v,w) \geq d(u,w)$ for all $u,v,w  \in \textbf{\textit{F}} \cup \textbf{\textit{C}}$)\\
+Given a set \textbf{\textit{F}} of \textbf{\textit{m}} points and another set \textbf{\textit{C}} of \textbf{\textit{n}} points in the plane, the objective is to open a set $\textbf{\textit{F}}’$ $\subseteq$ \textbf{\textit{F}} of \textbf{\textit{k}} facilities such that the maximum distance of any client in \textbf{\textit{C}} to its nearest open facility in \textbf{\textit{F}}’ is minimized. The distances between the points satisfy two properties: symmetry (i.e. d(u,v) = d(v,u) for all $u,v \in \textbf{\textit{F}} \cup \textbf{\textit{C}}$) and triangle inequality (i.e $d(u,v)+d(v,w) \geq d(u,w)$ for all $u,v,w  \in \textbf{\textit{F}} \cup \textbf{\textit{C}}$).\\
 
 Let $d(f,\textbf{\textit{F}}’)$ = minimum distance from point f to g where g is any point in  \textbf{\textit{F}}'. Then,
 \begin{equation} d(f,\textbf{\textit{F}}’) = \emph{min}\;d(f,g) : g \in \textbf{\textit{F}}’\end{equation}
@@ -40,13 +49,42 @@ Other applications include opening hospitals in a city with limited capacities, 
 \section{About the paper in concern}
 
 \section{Results}
-The $(1+\sqrt{3})$ approximation Euclidean k-Supplier algorithm proposed in \cite{EuclideanKS} has two major sub-routines, namely, An algorithm for ﬁnding maximum matching in general graphs \cite{MicaliVazirani}) and An optimal algorithm for approximate nearest neighbor searching in ﬁxed dimensions, which are by themselves well researched in the algorithmic domain (Sunil Arya and David M. Mount \cite{ANN}). In this programming assignment, the first major subroutine on Maximum Matching, also known the MV algorithm, has been programmed from the scratch based on the algorithmic exposition given by Paul A. Peterson and Michael C. Loui \cite{Exposition}. The second major subroutine on Approximate nearest neighbors has been implemented with the aid of the ANN library provided for public use by the authors themselves \cite{ANNLibrary}. The complete coding was done in C plus plus programming language. As the performance and correctness of the subroutines are crucial for efficient working of the main algorithm, we provide the results of unit tests on these sub routines first. The unit tests are followed by results of the complete algorithm.\\
+The $(1+\sqrt{3})$ approximation Euclidean k-Supplier algorithm proposed in \cite{EuclideanKS} has two major sub-routines, namely, An algorithm for ﬁnding maximum matching in general graphs \cite{MicaliVazirani} and An optimal algorithm for approximate nearest neighbor searching in ﬁxed dimensions  (Sunil Arya and David M. Mount \cite{ANN}), which are by themselves well researched in the algorithmic domain. In this programming assignment, the first major subroutine on Maximum Matching, also known as the MV algorithm, has been programmed from the scratch based on the algorithmic exposition given by Paul A. Peterson and Michael C. Loui \cite{Exposition}. The second major subroutine on Approximate nearest neighbors has been implemented with the aid of the ANN library provided for public use by the authors themselves \cite{ANNLibrary}. The complete coding was done in C plus plus programming language. As the performance and correctness of the subroutines are crucial for efficient working of the main algorithm, we provide the results of unit tests on these sub routines first. The unit tests are followed by results of the complete algorithm.\\
 \subsection{Unit test on component Algorithms}
 \subsubsection{Maximum Matching Algorithm (MicaliVazirani.cpp)}
+{\renewcommand{\arraystretch}{2}
+\begin{longtable}{ |p{2cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm}| p{2cm}|  }
+ \hline
+ \multicolumn{6}{|c|}{Unit test results} \\
+ \hline
+Type of graph & Number of nodes &Number of edges & Running Time (microseconds) & Size of NetworkX output & Size of our output\\
+ \hline
+Single Bloom, Two extensions   & 7   &7& 996&3&3  \\\hline
+Two Blooms, Three connecting edges   & 12   &13& 990&6&6  \\\hline
+Two blooms, three connected components   & 10   &15& 995&5&5  \\\hline
+Two blooms, one embedded inside other   & 9   &11& 997&4&4  \\\hline
+Two blooms, one embedded , connected at centre &9&11&999&4&4 \\\hline
+Three blooms, three connections   & 16   &18& 997&7&7  \\\hline
+Three hexagons, three bridges, Two extensions   &19  &21& 974&9&9  \\\hline
+Peterson graph & 10  &15& 309&5&5  \\\hline
+Bull graph   & 5   &5& 1019&2&2  \\\hline
+Dodecahedral graph   &20  &30 & 944 &10&10  \\\hline
+Frucht graph   &12   &18 & 997 &6&6  \\\hline
+Medium size 2D graph   & 100   &180& 5018&50&50  \\\hline
+Medium barbell graph   & 30   &101& 1995&15&15  \\\hline
+Large Barbell graph   &121   &2472& 42883&60&60  \\\hline
+Large ladder graph   & 2000   &2998& 80748&1000&1000  \\\hline
+Large Erdos Renyi Random graph &500 &74716& 1056175&250&250 \\\hline
+
+ \hline
+\end{longtable}
 \subsubsection{Approximate nearest neighbour search}
 
-\begin{thebibliography}{1}
+\subsection{Results of the main algorithm}
 
+\section{Conclusions from the empirical study}
+
+\begin{thebibliography}{5}
 \bibitem{EuclideanKS} 
 Viswanath Nagarajan, Baruch Schieber, and Hadas Shachnai
 \textit{The Euclidean k-Supplier Problem}.
