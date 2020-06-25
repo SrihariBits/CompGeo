@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
+using namespace std::chrono;
 template <class T>
 class VectorSet
 {
@@ -108,7 +109,7 @@ public:
 
     map<pair<int, int>, pair<int, int>> mate; //note all instances of != (none cases in python)
 
-    map<pair<int, int>, pair<int, int>> max_cardinality_matching()
+    map<pair<int, int>, pair<int, int>> general_matching_algorithm()
     {
         if (nodes.size() == 0)
             return {};
@@ -243,7 +244,7 @@ public:
                 pair<int, int> t = pairs.second;
                 if (nodeErase[s] == UNERASED and nodeErase[t] == UNERASED)
                 {
-                    augmented = augmentBlossom(s, t, i);
+                    augmented = bloss_aug(s, t, i);
                 }
             }
 
@@ -252,7 +253,7 @@ public:
         return augmented;
     }
 
-    bool augmentBlossom(pair<int, int> s, pair<int, int> t, int i)
+    bool bloss_aug(pair<int, int> s, pair<int, int> t, int i)
     {
         bool foundBloom = false;
         bool augmented = false;
@@ -287,7 +288,7 @@ public:
                 vector<pair<int, int>> pathR = findPath(dfsInfo.t, dfsInfo.vR, none);
                 vector<pair<int, int>> path = connectPath(pathL, pathR, dfsInfo.s, dfsInfo.t);
                 augmentMatching(dfsInfo.vL, dfsInfo.vR);
-                erasePath(path);
+                erase(path);
                 augmented = true;
                 break;
             }
@@ -479,7 +480,7 @@ public:
         return false;
     }
 
-    void erasePath(vector<pair<int, int>> &path)
+    void erase(vector<pair<int, int>> &path)
     {
         while (path.size() > 0)
         {
@@ -562,7 +563,7 @@ public:
             if (nodeBloom[xj].isDefined() and (nodeBloom[xj].peaks != b.peaks and nodeBloom[xj].base != b.base))
             {
                 nodeVisit[xj] = UNVISITED;
-                vector<pair<int, int>> temp = openBloom(xj);
+                vector<pair<int, int>> temp = open(xj);
                 int pathLength = temp.size();
                 path.erase(path.begin() + j, path.begin() + j + 2);
                 path.insert(path.begin() + j, temp.begin(), temp.end());
@@ -575,7 +576,7 @@ public:
     }
 
     vector<pair<int, int>>
-    openBloom(pair<int, int> x)
+    open(pair<int, int> x)
     {
         Bloom bloom = nodeBloom[x];
         pair<int, int> base = bloom.base;
@@ -639,11 +640,18 @@ int main()
         edges[{a, b}][{c, d}]["use"] = UNUSED;
         edges[{a, b}][{c, d}]["visit"] = UNVISITED;
     }
+    auto t1 = high_resolution_clock::now();
     MicaliVazirani MV(nodes, neighbors, edges);
-    map<pair<int, int>, pair<int, int>> mapping = MV.max_cardinality_matching();
+    map<pair<int, int>, pair<int, int>> mapping = MV.general_matching_algorithm();
+    auto t2 = high_resolution_clock::now();
+    auto int_ms = duration_cast<std::chrono::microseconds>(t2 - t1);
     for (auto maps : mapping)
     {
         cout << "\n(" << maps.first.first << "," << maps.first.second << ") = > (" << maps.second.first << "," << maps.second.second << ")";
     }
+    cout << "\nNodes: " << nodes.size();
+    cout << "\nEdges: " << e_count;
+    cout << "\nSize of output: " << mapping.size() / 2;
+    cout << "\nTime Taken: " << int_ms.count() << " microseconds";
     return 0;
 }
