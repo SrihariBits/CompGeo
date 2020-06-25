@@ -4,6 +4,10 @@
         "map": "cpp",
         "fstream": "cpp",
         "utility": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "cmath": "cpp",
+        "complex": "cpp",
+        "deque": "cpp",
+        "string": "cpp"
     }
 }

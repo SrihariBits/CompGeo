@@ -2,3 +2,7 @@ mv-matching/
 .vscode/
 .vscode/settings.json
 node_modules/
+test.cpp
+findEdges.cpp
+minEdgeCover.cpp
+a.out
