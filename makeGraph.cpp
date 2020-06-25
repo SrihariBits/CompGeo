@@ -5,6 +5,7 @@
 #include <ANN/ANN.h>
 #include<bits/stdc++.h>					// ANN declarations
 #include <chrono>
+#include "MicaliVazirani.h"
 using namespace std;					// make std:: accessible
 
 void getArgs(int argc, char **argv);			// get command-line arguments
@@ -12,7 +13,7 @@ void getArgs(int argc, char **argv);			// get command-line arguments
 int				k				= 1;			// number of nearest neighbors
 int				dim				= 2;			// dimension
 double			eps				= 0;			// error bound
-int				maxPts			= 1000;			// maximum number of data points
+int				maxPts			= 100002;			// maximum number of data points
 
 istream*		dataIn			= NULL;			// input for data points
 istream*		fdataIn			= NULL;			// input for query points
@@ -39,7 +40,11 @@ int main(int argc, char **argv)
 	int					    nPts;
     int                     nGpts;
     int                     f;
-    double                  L = 0.001;     		    
+    double                  low = 0;
+    double                  high = 100.0;                  
+    double                  L ;
+    int                     iter =0;
+    int                     max =0;     		    
 	ANNpointArray		    dataPts;
     ANNpointArray		    fdataPts;				
     ANNpoint                temp;				    
@@ -70,16 +75,23 @@ int main(int argc, char **argv)
 		f++;
 	}
 
+    auto start = chrono::high_resolution_clock::now();
+    do {
 
-    //Computing P of G
+        graph.clear();
+        corsFacility.clear();
+        L = (high + low)/2;
+        nGpts = 0 ;
+        //Computing P of G
     for(int i=0;i<nPts;i++){
         if(i==0){
             ptsGrph[i] = dataPts[i];
-            kdTree = new ANNkd_tree(ptsGrph,i+1,dim);
+            kdTree = new ANNkd_tree(ptsGrph,2,dim);
             nGpts++;        
             }
         else{
             kdTree -> annkSearch(dataPts[i],1,nnIdx,dists,eps);
+            // cout<< sqrt(dists[0]) << " ";
             if(sqrt(dists[0]) > (sqrt(3)*L)){
                 ptsGrph[nGpts] = dataPts[i];
                 kdTree -> ~ANNkd_tree();
@@ -91,31 +103,91 @@ int main(int argc, char **argv)
 
     //Computing E of G
     for(int i=0;i<f;i++){
-        kdTree -> annkSearch(fdataPts[i],2,nnIdx,dists,eps);
+        kdTree -> annkSearch(fdataPts[i],2,nnIdx,dists,eps);  
         if(sqrt(dists[0])<=L&&sqrt(dists[1])>L){
-            graph[nnIdx[0]].push_back(nnIdx[0]);
+            if(graph[nnIdx[0]].empty())
+                graph[nnIdx[0]].push_back(nnIdx[0]);
+            else
+            {
+             if(find(graph[nnIdx[0]].begin(),graph[nnIdx[0]].end(),nnIdx[0]) == graph[nnIdx[0]].end()) 
+                graph[nnIdx[0]].push_back(nnIdx[0]);       
+            }
             corsFacility[{nnIdx[0],nnIdx[0]}] = i;
         }
         else if(sqrt(dists[0])<=L&&sqrt(dists[1])<=L){
-            graph[nnIdx[0]].push_back(nnIdx[1]);
-            graph[nnIdx[1]].push_back(nnIdx[0]);
+            if(graph[nnIdx[0]].empty())
+                graph[nnIdx[0]].push_back(nnIdx[1]);
+            else
+            {
+             if(find(graph[nnIdx[0]].begin(),graph[nnIdx[0]].end(),nnIdx[1]) == graph[nnIdx[0]].end()) 
+                graph[nnIdx[0]].push_back(nnIdx[1]);       
+            }
+            if(graph[nnIdx[1]].empty())
+                graph[nnIdx[1]].push_back(nnIdx[0]);
+            else
+            {
+             if(find(graph[nnIdx[1]].begin(),graph[nnIdx[1]].end(),nnIdx[0]) == graph[nnIdx[1]].end()) 
+                graph[nnIdx[1]].push_back(nnIdx[0]);       
+            }
             corsFacility[{nnIdx[0],nnIdx[1]}] = i;
             corsFacility[{nnIdx[1],nnIdx[0]}] = i;
+        //    cout<< i << " ";
         } 
     }
 
+    if(nGpts > graph.size())
+        low = L-1 ;
+    if(nGpts <= graph.size())
+        high = L+1 ; 
 
-    delete [] nnIdx;							// clean things up
+    iter++;
+
+    if(iter==1000)
+        if(nGpts>k){
+            low = 2*L;
+            iter = 0;
+        }
+    } while(iter<=1000);
+    
+    // finding edge cover
+    MicaliVazirani mv = MicaliVazirani(graph);
+    map<pair<int, int>, pair<int, int>> maxmatch = mv.general_matching_algorithm();
+    int visited[nGpts];
+    for(auto elem: maxmatch){
+        visited[elem.first.first] =1;
+        visited[elem.second.first] =1;
+    }
+    for(int i=0;i<nGpts;i++){
+        if(visited[nGpts]==0)
+        maxmatch[{i,0}] = make_pair(graph[i][0],0);
+    }
+
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+    cout << " time :" << duration.count() << endl;
+    //self loops' facilities
+    cout << "Facilities  : ";
+    for(auto elem:corsFacility){
+        if(elem.first.first == elem.first.second)
+        cout << elem.second << " ";
+    }
+    //edges' facilities
+    for(auto elem: maxmatch){
+        if(corsFacility[{elem.first.first,elem.second.first}]!=-1){
+            cout<< corsFacility[{elem.first.first,elem.second.first}] << " ";
+            corsFacility[{elem.second.first,elem.first.first}] = -1;
+        }
+    }
+    cout << endl ;
+    cout << "L : " << L << endl;
+    delete [] nnIdx;							
     delete [] dists;
     delete kdTree;
-	annClose();									// done with ANN
+	annClose();									
 
 	return EXIT_SUCCESS;
 }
 
-//----------------------------------------------------------------------
-//	getArgs - get command line arguments
-//----------------------------------------------------------------------
 
 void getArgs(int argc, char **argv)
 {
@@ -123,20 +195,6 @@ void getArgs(int argc, char **argv)
 	static ifstream queryStream;				// query file stream
 
 	if (argc <= 1) {							// no arguments
-		cerr << "Usage:\n\n"
-		<< "  ann_sample [-d dim] [-max m] [-nn k] [-e eps] [-df data]"
-		   " [-qf query]\n\n"
-		<< "  where:\n"
-		<< "    dim      dimension of the space (default = 2)\n"
-		<< "    m        maximum number of data points (default = 1000)\n"
-		<< "    k        number of nearest neighbors per query (default 1)\n"
-		<< "    eps      the error bound (default = 0.0)\n"
-		<< "    data     name of file containing data points\n"
-		<< "    query    name of file containing query points\n\n"
-		<< " Results are sent to the standard output.\n"
-		<< "\n"
-		<< " To run this demo use:\n"
-		<< "    ann_sample -df data.pts -qf query.pts\n";
 		exit(0);
 	}
 	int i = 1;
@@ -147,7 +205,7 @@ void getArgs(int argc, char **argv)
 		else if (!strcmp(argv[i], "-max")) {	// -max option
 			maxPts = atoi(argv[++i]);			// get max number of points
 		}
-		else if (!strcmp(argv[i], "-nn")) {		// -nn option
+		else if (!strcmp(argv[i], "-k")) {		// -nn option
 			k = atoi(argv[++i]);				// get number of near neighbors
 		}
 		else if (!strcmp(argv[i], "-e")) {		// -e option
