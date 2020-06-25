@@ -19,7 +19,7 @@
  }
 
 \title{%
- \LARGE  CS F402 Computational Geometry
+ \LARGE        CS F402 Computational Geometry
 \newline
 \newline
 \LARGE Programming Project\\
@@ -60,7 +60,7 @@ Other applications include opening hospitals in a city with limited capacities, 
  \eIf{$|T| > k$}{
  the optimal value is larger than L\;
  }{output the facilities corresponding to T as solution\;}
- \caption{Algorithm for Euclidean k-supplier \newline\newline}
+ \caption{Algorithm for Euclidean k-supplier\newline}
  \end{algorithm}
 
 As a part of this algorithm, we are required to calculate the minimum edge cover. We achieve this by first finding the set of edges in the maximum match and then for each vertex of degree zero, add any of its edges to the set. It can be shown that this effectively converts the output of maximum matching algorithm (\cite{MicaliVazirani}) to a set of edges in minimum edge cover, as required by the Euclidean k-Supplier algorithm.\\
@@ -72,9 +72,8 @@ $M \gets$ output of Maximum Matching on Auxillary graph\;
  Add e to M\;
  }
  Output M\;
- \caption{Minimum edge cover from Maximum Matching\newline\newline}
+ \caption{Minimum edge cover from Maximum Matching\newline}
  \end{algorithm}
- 
 \begin{algorithm}[H]
  $P \gets \emptyset$ and $ P' \gets \emptyset$ \;
  \For{$v \in C$}{
@@ -139,6 +138,17 @@ Large Erdos Renyi Random graph &500 &74716& 1056175&250&250 \\\hline
 \subsection{Results of the main algorithm}
 
 \section{Conclusions from the empirical study}
+
+\section{Appendix: Type of input and expected output for each enclosed cpp file}
+\subsection{MicaliVazirani.h}
+\textbf{Input}: An object of the class MicaliVazirani must be instantiated by passing an adjacency list in the form of $map< int, vector<int>>$ to the construtor. Then the method general\_matching\_algorithm can be called on that object.
+
+\textbf{Output}: The function general\_matching\_algorithm returns a $map<pair<int,int>,pair<int,int>>$. If the input had was of single dimension then the second element of pair is taken as `0'.
+
+\subsection{MakeGraph.cpp}
+\textbf{Input}: \\
+
+\textbf{Output}: \\
 
 \begin{thebibliography}{5}
 \bibitem{EuclideanKS} 
