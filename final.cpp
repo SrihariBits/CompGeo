@@ -197,44 +197,11 @@ void getArgs(int argc, char **argv)
 	if (argc <= 1) {							// no arguments
 		exit(0);
 	}
-	int i = 1;
-	while (i < argc) {							// read arguments
-		if (!strcmp(argv[i], "-d")) {			// -d option
-			dim = atoi(argv[++i]);				// get dimension to dump
-		}
-		else if (!strcmp(argv[i], "-max")) {	// -max option
-			maxPts = atoi(argv[++i]);			// get max number of points
-		}
-		else if (!strcmp(argv[i], "-k")) {		// -nn option
-			k = atoi(argv[++i]);				// get number of near neighbors
-		}
-		else if (!strcmp(argv[i], "-e")) {		// -e option
-			sscanf(argv[++i], "%lf", &eps);		// get error bound
-		}
-		else if (!strcmp(argv[i], "-df")) {		// -df option
-			dataStream.open(argv[++i], ios::in);// open data file
-			if (!dataStream) {
-				cerr << "Cannot open data file\n";
-				exit(1);
-			}
-			dataIn = &dataStream;				// make this the data stream
-		}
-		else if (!strcmp(argv[i], "-qf")) {		// -qf option
-			queryStream.open(argv[++i], ios::in);// open query file
-			if (!queryStream) {
-				cerr << "Cannot open query file\n";
-				exit(1);
-			}
-			fdataIn = &queryStream;			// make this query stream
-		}
-		else {									// illegal syntax
-			cerr << "Unrecognized option.\n";
-			exit(1);
-		}
-		i++;
-	}
-	if (dataIn == NULL || fdataIn == NULL) {
-		cerr << "-df and -qf options must be specified\n";
-		exit(1);
-	}
+	int i = 0;
+    k = atoi(argv[++i]);
+    dataStream.open(argv[++i], ios::in);
+    dataIn = &dataStream;
+    queryStream.open(argv[++i], ios::in);
+    fdataIn = &queryStream;
+	
 }
