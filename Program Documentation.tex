@@ -52,16 +52,15 @@ Other applications include opening hospitals in a city with limited capacities, 
 
 \subsection{Pseudocodes and Explanation}
 \begin{algorithm}[H]
- \While{not at end of this document}{
-  read current\;
-  \eIf{understand}{
-   go to next section\;
-   current section becomes this one\;
-   }{
-   go back to the beginning of current section\;
-  }
- }
- \caption{Algorithm for Euclidean k-supplier}
+ Pick a maximal subset $P \subset C$ such that each pairwise distance in P is more than $\sqrt{3}.L$\;
+ Construct graph G=(P,E) with vertex set P and edge set $E = E1 \cup E2$, where \newline
+ E1 =  {(u,u) : $ u \in P, \exists f \in F $ with $d(u,f) \leq L$ and $d(v,f) > L \forall v \in P\backslash u$}\;
+ E2 =  {(u,v) : $u,v \in P, \exists f \in F$ with $d(u,f) \leq L$ and $d(v,f) \leq L$}\;
+ Compute the minimum edge cover $T \subset E$ in G\;
+ \eIf{$|T| > k$}{
+ the optimal value is larger than L\;
+ }{output the facilities corresponding to T as solution\;}
+ \caption{Algorithm for Euclidean k-supplier \newline\newline}
  \end{algorithm}
 
 As a part of this algorithm, we are required to calculate the minimum edge cover. We achieve this by first finding the set of edges in the maximum match and then for each vertex of degree zero, add any of its edges to the set. It can be shown that this effectively converts the output of maximum matching algorithm (\cite{MicaliVazirani}) to a set of edges in minimum edge cover, as required by the Euclidean k-Supplier algorithm.\\
@@ -73,7 +72,7 @@ $M \gets$ output of Maximum Matching on Auxillary graph\;
  Add e to M\;
  }
  Output M\;
- \caption{Minimum edge cover from Maximum Matching}
+ \caption{Minimum edge cover from Maximum Matching\newline\newline}
  \end{algorithm}
  
 \begin{algorithm}[H]
@@ -84,7 +83,7 @@ $M \gets$ output of Maximum Matching on Auxillary graph\;
   $P \gets P \cup{v}$ and insert v into P'\;
    }
  }
-\caption{Algorithm for computing vertices}
+\caption{Algorithm for computing vertices\newline\newline}
 \end{algorithm}
 
 \begin{algorithm}[H]
@@ -100,7 +99,7 @@ $M \gets$ output of Maximum Matching on Auxillary graph\;
    }
  }
  Output E\;
- \caption{Algorithm for computing Edges}
+ \caption{Algorithm for computing Edges\newline\newline}
 \end{algorithm}
 
 \section{Results}
@@ -136,7 +135,6 @@ Large Erdos Renyi Random graph &500 &74716& 1056175&250&250 \\\hline
 
  \hline
 \end{longtable}
-\subsubsection{Approximate nearest neighbour search}
 
 \subsection{Results of the main algorithm}
 
