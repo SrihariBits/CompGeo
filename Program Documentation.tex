@@ -57,7 +57,7 @@ As common in many bottleneck optimization algorithms, an additional parameter \t
  2. a k-supplier solution of value at most $\alpha$ * $\textit{L}$. where $ \alpha = 1+\sqrt(3)$ is the approximation ratio. \\
 The final algorithm uses binary search to find the best value of \textit{L}. \\
  
-So, for a choosen \textit{L}, we do the following. \\ 
+So, for a chosen \textit{L}, we do the following. \\ 
 A maximal subset of clients is selected such that the distance between any pair of clients is greater than $\sqrt(3)$ * \textit{L}. We construct a graph based on these selected clients as vertices. We also select a subset of facilities such that there is a one to one correspondence between these facilities and edges in the graph. The facilities in this subset are selected such that there is atleast one and atmost two clients in the graph within distance \textit{L}.\\
 In other words, there is an edge for a pair of vertices in that graph, if there is a facility which is at distance less than \textit{L} from both the vertices. For a client, if there is no such partner client satisfying that rule, then there is a self loop for that client in the graph. \\
 More formally, lets say the new graph \textit{G} has the vertex set \textit{P} edge set \textit{E}=\textit{E1} $\cup$ \textit{E2} \\
@@ -71,8 +71,10 @@ And also, for finding minimum edge cover, we find the maximum matching of \texti
   
  \subsection{Time Complexity}
 Generally for constructing the graph, it takes $O(n^2)$ time which involves finding the vertices and then edges. But using approximate nearest neighbours algorithm by Arya and Mount, we can construct the graph in $O(nlog{}n)$ time complexity but with a loss of $1+\epsilon$ factor.
-And the fastest known edge cover algorithm is finding the maximum matching and takes linear time to find the minimum edge cover from that. Micali and Vazirani's maximum matching algorithm runs in $O(\textit{E $\sqrt{V}$})$. In our case, $\textit{E} \leq \textit{n}$ and $\textit{V} \leq \textit{n}$, where \textit{n} is number of facilities and clients combined. Therefore, this step takes $O(n^{1.5})$ time. \\
+And the fastest known edge cover algorithm is finding the maximum matching and in linear time find the minimum edge cover. Micali and Vazirani's maximum matching algorithm runs in $O(\textit{E $\sqrt{V}$})$. In our case, $\textit{E} \leq \textit{n}$ and $\textit{V} \leq \textit{n}$. Because every edge has a corresponding facility and therefore edges are less than number of facilities. And also, the number of vertices is a subset of clents and therefore number of vertices is less than total number of clients. Here, \textit{n} is number of facilities and clients combined. Therefore, this step takes $O(n^{1.5})$ time. \\
+For finding the minimum edge cover from maximum matching takes linear time. Because we go through the graph once and note the unsaturated vertices (vertices which don't have any edge in maximum matching). Now for every such vertex, we add any of the edge of that vertex to the set of maximum matched edges. In this way, every vertex is covered and we have minimum edge cover. \\
 Considering both the steps of creating the graph and finding the minimum edge cover on it, our algorithm runs in $O(n^{1.5})$ time.
+
 
 
 \subsection{Pseudocodes and Explanation}
