@@ -169,16 +169,14 @@ Large Erdos Renyi Random graph &500 &74716& 1056175&250&250 \\\hline
  \hline
 Type of graph & k- value & Number of Client nodes &Number of Facility nodes & Running Time (microseconds) & Best L value\\
  \hline
-Single Bloom, Two extensions   & 7   &7& 996&3&3  \\\hline
-Two Blooms, Three connecting edges   & 12   &13& 990&6&6  \\\hline
-Two blooms, three connected components   & 10   &15& 995&5&5  \\\hline
-Two blooms, one embedded inside other   & 9   &11& 997&4&4  \\\hline
+Near circle clients embedded facilities   & 4   &10& 3&4148&4.17163  \\\hline
+Single Line clients Spread facilities   & 2   &6& 4&2697&3.29688  \\\hline
+Annular Facilities and clients  & 1   &9& 14&3718&2.53125  \\\hline
+Random many clients few facilities   & 2   &43& 3&8466&7.125  \\\hline
+Random many facilities Few clients  & 2   &5& 30&32678&4.90128  \\\hline
 Large grid of clients and few facilities &2&10000&11&1320631&35.0703 \\\hline
 Rainbow arc of client and facilities   & 3  &75& 14&13146&2.53125  \\\hline
 Alternate rainbows of client and facilities&10 &27 &21&26934&1.09659  \\\hline
-Peterson graph & 10  &15& 309&5&5  \\\hline
-Bull graph   & 5   &5& 1019&2&2  \\\hline
-Dodecahedral graph   &20  &30 & 944 &10&10  \\\hline
 
  \hline
 \end{longtable}
@@ -186,12 +184,12 @@ Dodecahedral graph   &20  &30 & 944 &10&10  \\\hline
 \begin{tikzpicture}
 \begin{axis}[
     title={Input size vs Running time plot},
-    xlabel={Number of nodes},
+    xlabel={Number of nodes (total)},
     ylabel={Running time [in microseconds]},
-    xmin=0, xmax=3000,
-    ymin=3000, ymax=1100000,
-    xtick={0,500,1000,1500,2000,2500,3000},
-    ytick={3000, 500000, 1000000},
+    xmin=0, xmax=11000,
+    ymin=2000, ymax=1500000,
+    xtick={ 5000, 10000, 12000},
+    ytick={3000, 500000, 1000000, 1500000},
     legend pos=north west,
     ymajorgrids=true,
     grid style=dashed,
@@ -202,6 +200,7 @@ Dodecahedral graph   &20  &30 & 944 &10&10  \\\hline
     mark=square,
     ]
     coordinates {
+    (13,4148)(10,2697)(23,3718)(46,8466)(35,32678)(10011,1320631)(89,13146)(48,26934)
     };
     \legend{}
     
@@ -209,6 +208,13 @@ Dodecahedral graph   &20  &30 & 944 &10&10  \\\hline
 \end{tikzpicture}
 
 \section{Conclusions from the empirical study}
+So in this project, we have successfully implemented the Euclidean k-supplier problem which is one of the topics actively researched in Computational Geometry. We have implemented it based on the research paper by Nagaran \etal. We could achieve the Time Complexity of $O(n^{1.5})$ with the approximation factor of $1+\sqrt{3}$. This algorithm is different in the sense that it used many different algorithms and concepts to arrive at a better approximation algorithm for a very useful problem.\\
+
+While implementing the algorithm, we faced difficulty in finding the correct value of L. If we choose a very small L, the graph G contains isolated vertices. But for finding minimum edge cover, we should have a connected graph. If L is large, we only get a few vertices and it will not be the optimal L.
+
+Further extensions to this project could be to add a visualization of the clients, supplier and suppliers chosen.   
+
+In the course of this project, we have learnt many things from installing CGAL and also the library ANN by Arya and Mount. We have learnt how to install c++ libraries by downloading include and .cpp files and then compiling them and making the .lib and .dll files making available for the compiler to process. It is a new experience for us and also learnt many things about how libraries work.
 
 \section{Appendix: Type of input and expected output for each enclosed cpp file}
 \subsection{MicaliVazirani.h}
