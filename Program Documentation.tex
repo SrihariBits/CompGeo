@@ -10,6 +10,7 @@
 \usepackage{graphicx}
 \usepackage{longtable}
 \usepackage[]{algorithm2e}
+\usepackage{pgfplots}
 \graphicspath{ {./images/} }
  \geometry{
  a4paper,
@@ -48,7 +49,31 @@ Multiple applications of the euclidean K-supplier problem can be found. One obvi
 Other applications include opening hospitals in a city with limited capacities, opening of centres for the disposal of obnoxious substances, setting up servers in a network, data mining and information retrieval such as data clustering.\\
 
 \section{About the paper in concern}
-%Write some stuff about history? Write in brief about the algorithm itself
+The implementation for the Euclidean K Supplier problem done in this project is based on the research paper by Nagarajan \etal \cite{EuclideanKS}. They present a 2.73 approximation algorithm. It is very close to the nearest possible approximation algorithm (It is NP-hard to approximate the algorithm better than 2.65). The approach taken in this algorithm is also impressive. They use information on the pairs of clients to solve the problem. We have implemented the algorithm for 2 dimensional case.\\
+
+\subsection{Algorithm}
+As common in many bottleneck optimization algorithms, an additional parameter \textit{L} is selected ( which is the objective value ) and outputs one of the following :\\
+ 1. a certicate showing that the optimal k-supplier value is more than \textit{L}, or \\
+ 2. a k-supplier solution of value at most $\alpha$ * $\textit{L}$. where $ \alpha = 1+\sqrt(3)$ is the approximation ratio. \\
+The final algorithm uses binary search to find the best value of \textit{L}. \\
+ 
+So, for a choosen \textit{L}, we do the following. \\ 
+A maximal subset of clients is selected such that the distance between any pair of clients is greater than $\sqrt(3)$ * \textit{L}. We construct a graph based on these selected clients as vertices. We also select a subset of facilities such that there is a one to one correspondence between these facilities and edges in the graph. The facilities in this subset are selected such that there is atleast one and atmost two clients in the graph within distance \textit{L}.\\
+In other words, there is an edge for a pair of vertices in that graph, if there is a facility which is at distance less than \textit{L} from both the vertices. For a client, if there is no such partner client satisfying that rule, then there is a self loop for that client in the graph. \\
+More formally, lets say the new graph \textit{G} has the vertex set \textit{P} edge set \textit{E}=\textit{E1} $\cup$ \textit{E2} \\
+  \textit{E1} = {(\textit{u,v}) : $\textit{u,v} \in \textit{P}$, $\exists\textit{f} \in \textit{F}$ with $\textit{d(u,f)} \leq \textit{L}$ and $\textit{d(v,f)} \leq \textit{L}$} \\
+ \textit{E2} = {(\textit{u,u}) : $\textit{u} \in \textit{P}$, $\exists\textit{f} \in \textit{F}$ with $\textit{d(u,f)} \leq \textit{L}$ and $\forall \textit{v} \in \textit{P}$, $\textit{(u,v)} \notin \textit{E1}$} \\
+Then we find the minimum edge cover on this new graph \textit{G}. If the number of edges in the minimum edge cover is greater than \textit{k}, then the optimal value is greater than \textit{L} else output the facilities corresponding to the edges in the minimum edge cover. \\
+ 
+For constructing the graph, we have used an algorithm for finding the approximate nearest neighbour with $(1+\epsilon)$ approximation ratio $(\epsilon=0.2)$ by Arya and Mount.\\
+And also, for finding minimum edge cover, we find the maximum matching of \textit{G} using Micali and Vazirani's algorithm and then in linear time find the minimum edge cover of \textit{G} \\
+
+  
+ \subsection{Time Complexity}
+Generally for constructing the graph, it takes $O(n^2)$ time which involves finding the vertices and then edges. But using approximate nearest neighbours algorithm by Arya and Mount, we can construct the graph in $O(nlog{}n)$ time complexity but with a loss of $1+\epsilon$ factor.
+And the fastest known edge cover algorithm is finding the maximum matching and takes linear time to find the minimum edge cover from that. Micali and Vazirani's maximum matching algorithm runs in $O(\textit{E $\sqrt{V}$})$. In our case, $\textit{E} \leq \textit{n}$ and $\textit{V} \leq \textit{n}$, where \textit{n} is number of facilities and clients combined. Therefore, this step takes $O(n^{1.5})$ time. \\
+Considering both the steps of creating the graph and finding the minimum edge cover on it, our algorithm runs in $O(n^{1.5})$ time.
+
 
 \subsection{Pseudocodes and Explanation}
 \begin{algorithm}[H]
@@ -136,19 +161,70 @@ Large Erdos Renyi Random graph &500 &74716& 1056175&250&250 \\\hline
 \end{longtable}
 
 \subsection{Results of the main algorithm}
+\begin{longtable}{ |p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}| p{2cm}|  }
+ \hline
+ \multicolumn{6}{|c|}{Unit test results} \\
+ \hline
+Type of graph & k- value & Number of Client nodes &Number of Facility nodes & Running Time (microseconds) & Best L value\\
+ \hline
+Single Bloom, Two extensions   & 7   &7& 996&3&3  \\\hline
+Two Blooms, Three connecting edges   & 12   &13& 990&6&6  \\\hline
+Two blooms, three connected components   & 10   &15& 995&5&5  \\\hline
+Two blooms, one embedded inside other   & 9   &11& 997&4&4  \\\hline
+Large grid of clients and few facilities &2&10000&11&1320631&35.0703 \\\hline
+Rainbow arc of client and facilities   & 3  &75& 14&13146&2.53125  \\\hline
+Alternate rainbows of client and facilities&10 &27 &21&26934&1.09659  \\\hline
+Peterson graph & 10  &15& 309&5&5  \\\hline
+Bull graph   & 5   &5& 1019&2&2  \\\hline
+Dodecahedral graph   &20  &30 & 944 &10&10  \\\hline
+
+ \hline
+\end{longtable}
+
+\begin{tikzpicture}
+\begin{axis}[
+    title={Input size vs Running time plot},
+    xlabel={Number of nodes},
+    ylabel={Running time [in microseconds]},
+    xmin=0, xmax=3000,
+    ymin=3000, ymax=1100000,
+    xtick={0,500,1000,1500,2000,2500,3000},
+    ytick={3000, 500000, 1000000},
+    legend pos=north west,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    };
+    \legend{}
+    
+\end{axis}
+\end{tikzpicture}
 
 \section{Conclusions from the empirical study}
 
 \section{Appendix: Type of input and expected output for each enclosed cpp file}
 \subsection{MicaliVazirani.h}
-\textbf{Input}: An object of the class MicaliVazirani must be instantiated by passing an adjacency list in the form of $map< int, vector<int>>$ to the construtor. Then the method general\_matching\_algorithm can be called on that object.
+\textbf{Input}: An object of the class MicaliVazirani must be instantiated by passing an adjacency list in the form of $map< int, vector<int>>$ to the construtor. Then the method general\_matching\_algorithm can be called on that object.\\
 
 \textbf{Output}: The function general\_matching\_algorithm returns a $map<pair<int,int>,pair<int,int>>$. If the input had was of single dimension then the second element of pair is taken as `0'.
 
-\subsection{MakeGraph.cpp}
-\textbf{Input}: \\
+\subsection{euclideanKSupplier.cpp}
+\textbf{Environment variables for ANN}: \\CPLUS\_LIBRARY\_PATH = $<$path to include files$>$\\
+LIBRARY\_PATH = $<$path to library containing .a files in Linux or .DLL and .lib in Windows$>$\\
 
-\textbf{Output}: \\
+\textbf{Compilation}: g++ euclideanKSupplier.cpp -lANN\\
+
+\textbf{Input}: Input is through command line.\\
+./a.out (k) (clients file) (facilities file) [in Linux]\\
+./a.exe (k) (clients file) (facilities file) [in Windows]\\
+
+\textbf{Output}: The best possible L value and the facilities corresponding to that value of L\\
 
 \begin{thebibliography}{5}
 \bibitem{EuclideanKS} 
